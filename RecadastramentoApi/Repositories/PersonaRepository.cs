@@ -280,7 +280,13 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
             @DigitalOk,
             @DigitalValor,
             @DigitalImagem,
-            CASE WHEN @DigitalHstore01Json IS NULL THEN NULL ELSE hstore(@DigitalHstore01Json::json) END
+            CASE
+                WHEN @DigitalHstore01Json IS NULL THEN NULL
+                ELSE (
+                    SELECT hstore(array_agg(key), array_agg(value))
+                    FROM json_each_text(@DigitalHstore01Json::json)
+                )
+            END
         );
         """;
 
@@ -370,7 +376,13 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
             digital_ok = @DigitalOk,
             digital_valor = @DigitalValor,
             digital_imagem = @DigitalImagem,
-            digital_hstore01 = CASE WHEN @DigitalHstore01Json IS NULL THEN NULL ELSE hstore(@DigitalHstore01Json::json) END
+            digital_hstore01 = CASE
+                WHEN @DigitalHstore01Json IS NULL THEN NULL
+                ELSE (
+                    SELECT hstore(array_agg(key), array_agg(value))
+                    FROM json_each_text(@DigitalHstore01Json::json)
+                )
+            END
         WHERE cpf = @Cpf;
         """;
 
