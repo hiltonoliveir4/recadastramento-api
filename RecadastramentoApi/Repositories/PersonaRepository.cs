@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text;
 using System.Text.Json;
 using Dapper;
@@ -477,7 +478,10 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
     private static DynamicParameters BuildParameters(PersonaUpsertDto dto)
     {
         var parameters = new DynamicParameters(dto);
-        parameters.Add("DigitalHstore01Json", dto.DigitalHstore01 is null ? null : JsonSerializer.Serialize(dto.DigitalHstore01));
+        parameters.Add(
+            "DigitalHstore01Json",
+            dto.DigitalHstore01 is null ? null : JsonSerializer.Serialize(dto.DigitalHstore01),
+            DbType.String);
         return parameters;
     }
 }
