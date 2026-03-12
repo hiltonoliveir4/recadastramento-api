@@ -1,0 +1,101 @@
+using Microsoft.AspNetCore.Mvc;
+
+namespace RecadastramentoApi.DTO;
+
+public sealed class PersonaFilterDto
+{
+    public long? Id { get; set; }
+    [FromQuery(Name = "fkrecadastramento")]
+    public int? FkRecadastramento { get; set; }
+
+    [FromQuery(Name = "nome")]
+    public string? Nome { get; set; }
+    public string? NomeSocial { get; set; }
+    public string? Fonetico { get; set; }
+    [FromQuery(Name = "cpf")]
+    public string? Cpf { get; set; }
+    public string? Pasep { get; set; }
+    public DateTime? DataNascimento { get; set; }
+    public DateTime? DataFalecimento { get; set; }
+    public string? Mae { get; set; }
+    public string? Pai { get; set; }
+    public short? SexoEnum { get; set; }
+    public short? EtniaEnum { get; set; }
+    public short? Ddd { get; set; }
+    public string? Telefone { get; set; }
+    public string? Telefone2 { get; set; }
+    public string? EMail { get; set; }
+    public string? Nit { get; set; }
+    public string? Nis { get; set; }
+    public short? NacionalidadeEnum { get; set; }
+    public short? NacionalidadePais { get; set; }
+    public int? NaturalidadeId { get; set; }
+    public short? CodEstCivil { get; set; }
+    public short? CodInstrucao { get; set; }
+    public short? TiposangEnum { get; set; }
+    public string? Rg { get; set; }
+    public DateTime? RgData { get; set; }
+    public int? RgCodEmissor { get; set; }
+    public string? RgUf { get; set; }
+    public int? Cnes { get; set; }
+    public string? Ctps { get; set; }
+    public string? CtpsSerie { get; set; }
+    public string? CtpsUf { get; set; }
+    public DateTime? CtpsData { get; set; }
+    public DateTime? DataOpcao { get; set; }
+    public short? CtpsDigital { get; set; }
+    public string? Titulo { get; set; }
+    public DateTime? TituloData { get; set; }
+    public string? TituloZona { get; set; }
+    public string? TituloSecao { get; set; }
+    public int? TituloFkcidade { get; set; }
+    public string? Habilitacao { get; set; }
+    public short? HabilitacaoCategEnum { get; set; }
+    public DateTime? HabilitacaoValidade { get; set; }
+    public DateTime? HabilitacaoEmissao { get; set; }
+    public short? DefFisica { get; set; }
+    public short? DefVisual { get; set; }
+    public short? DefAuditiva { get; set; }
+    public short? DefMental { get; set; }
+    public short? DefIntelectual { get; set; }
+    public short? DefReabilitado { get; set; }
+    public short? DefCota { get; set; }
+    public string? DefObservacao { get; set; }
+    public short? TipoLogradouro { get; set; }
+    public string? Logradouro { get; set; }
+    public string? Numero { get; set; }
+    public string? Complemento { get; set; }
+    public string? Cep { get; set; }
+    public string? Bairro { get; set; }
+    [FromQuery(Name = "municipio_id")]
+    public int? MunicipioId { get; set; }
+    public string? PontoReferencia { get; set; }
+    public string? CodBanco { get; set; }
+    public string? Agencia { get; set; }
+    public string? Conta { get; set; }
+    public short? ContaOp { get; set; }
+    public short? ContaTipo { get; set; }
+    public int? SyncBimestre { get; set; }
+    public DateTime? ControleDataMigracao { get; set; }
+    public int? ControleUsuarioId { get; set; }
+    public DateTime? ControleDataAlteracao { get; set; }
+    public string? ControleVerificador { get; set; }
+    public int? ControleCadastradorId { get; set; }
+    public DateTime? ControleDataCadastro { get; set; }
+    public int? RecadUserid { get; set; }
+    public DateTime? RecadData { get; set; }
+    public int? RecadVersao { get; set; }
+    [FromQuery(Name = "recad_status")]
+    public int? RecadStatus { get; set; }
+    public int? OrdemFkorgao { get; set; }
+    public string? OrdemNumero { get; set; }
+    public DateTime? OrdemEmissao { get; set; }
+    public DateTime? OrdemValidade { get; set; }
+    public string? OrdemObservacao { get; set; }
+    [FromQuery(Name = "uf")]
+    public string? Uf { get; set; }
+    public bool? DigitalOk { get; set; }
+    public string? DigitalValor { get; set; }
+    public string? DigitalImagem { get; set; }
+    public Dictionary<string, string>? DigitalHstore01 { get; set; }
+}

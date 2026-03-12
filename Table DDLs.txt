@@ -1,0 +1,512 @@
+-- Table: recadastra.recad_persona
+
+-- DROP TABLE IF EXISTS recadastra.recad_persona;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_persona
+(
+    id bigint NOT NULL DEFAULT nextval(('recadastra.recad_persona_id_seq'::text)::regclass),
+    fkrecadastramento integer,
+    nome character varying(50) COLLATE pg_catalog."default",
+    nome_social character varying(100) COLLATE pg_catalog."default",
+    fonetico character varying(50) COLLATE pg_catalog."default",
+    cpf character varying(11) COLLATE pg_catalog."default" NOT NULL,
+    pasep character varying(11) COLLATE pg_catalog."default",
+    data_nascimento date,
+    data_falecimento date,
+    mae character varying(50) COLLATE pg_catalog."default",
+    pai character varying(50) COLLATE pg_catalog."default",
+    sexo_enum smallint NOT NULL DEFAULT 1,
+    etnia_enum smallint NOT NULL DEFAULT 1,
+    ddd smallint,
+    telefone character varying(15) COLLATE pg_catalog."default",
+    telefone2 character varying(15) COLLATE pg_catalog."default",
+    e_mail character varying(45) COLLATE pg_catalog."default",
+    nit character varying(11) COLLATE pg_catalog."default",
+    nis character varying(11) COLLATE pg_catalog."default",
+    nacionalidade_enum smallint NOT NULL DEFAULT 10,
+    nacionalidade_pais smallint NOT NULL DEFAULT 105,
+    naturalidade_id integer,
+    cod_est_civil smallint,
+    cod_instrucao smallint,
+    tiposang_enum smallint,
+    rg character varying(15) COLLATE pg_catalog."default",
+    rg_data date,
+    rg_cod_emissor integer,
+    rg_uf character(2) COLLATE pg_catalog."default",
+    cnes integer,
+    ctps character varying(11) COLLATE pg_catalog."default",
+    ctps_serie character varying(5) COLLATE pg_catalog."default",
+    ctps_uf character(2) COLLATE pg_catalog."default",
+    ctps_data date,
+    data_opcao date,
+    ctps_digital smallint,
+    titulo character varying(15) COLLATE pg_catalog."default",
+    titulo_data date,
+    titulo_zona character varying(4) COLLATE pg_catalog."default",
+    titulo_secao character varying(5) COLLATE pg_catalog."default",
+    titulo_fkcidade integer,
+    habilitacao character varying(15) COLLATE pg_catalog."default",
+    habilitacao_categ_enum smallint,
+    habilitacao_validade date,
+    habilitacao_emissao date,
+    def_fisica smallint NOT NULL DEFAULT 0,
+    def_visual smallint NOT NULL DEFAULT 0,
+    def_auditiva smallint NOT NULL DEFAULT 0,
+    def_mental smallint NOT NULL DEFAULT 0,
+    def_intelectual smallint NOT NULL DEFAULT 0,
+    def_reabilitado smallint NOT NULL DEFAULT 0,
+    def_cota smallint NOT NULL DEFAULT 0,
+    def_observacao character varying(255) COLLATE pg_catalog."default",
+    tipo_logradouro smallint,
+    logradouro character varying(100) COLLATE pg_catalog."default",
+    numero character varying(10) COLLATE pg_catalog."default",
+    complemento character varying(100) COLLATE pg_catalog."default",
+    cep character(15) COLLATE pg_catalog."default",
+    bairro character varying(100) COLLATE pg_catalog."default",
+    municipio_id integer,
+    ponto_referencia character varying(255) COLLATE pg_catalog."default",
+    cod_banco character(3) COLLATE pg_catalog."default",
+    agencia character varying(10) COLLATE pg_catalog."default",
+    conta character varying(15) COLLATE pg_catalog."default",
+    conta_op smallint,
+    conta_tipo smallint,
+    sync_bimestre integer,
+    controle_data_migracao timestamp without time zone,
+    controle_usuario_id integer,
+    controle_data_alteracao timestamp without time zone,
+    controle_verificador character varying(40) COLLATE pg_catalog."default",
+    controle_cadastrador_id integer,
+    controle_data_cadastro timestamp without time zone,
+    recad_userid integer,
+    recad_data timestamp without time zone,
+    recad_versao integer,
+    recad_status integer,
+    ordem_fkorgao integer DEFAULT 0,
+    ordem_numero character varying(15) COLLATE pg_catalog."default",
+    ordem_emissao timestamp(0) without time zone,
+    ordem_validade timestamp(0) without time zone,
+    ordem_observacao text COLLATE pg_catalog."default",
+    uf character(2) COLLATE pg_catalog."default",
+    digital_ok boolean NOT NULL DEFAULT false,
+    digital_valor text COLLATE pg_catalog."default",
+    digital_imagem text COLLATE pg_catalog."default",
+    digital_hstore01 hstore,
+    CONSTRAINT recad_persona_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_persona_fk_banco FOREIGN KEY (cod_banco)
+        REFERENCES recadastra.recad_banco (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_contatipo FOREIGN KEY (conta_tipo)
+        REFERENCES recadastra.recad_contatipo (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_estcivil FOREIGN KEY (cod_est_civil)
+        REFERENCES recadastra.recad_estadocivil (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_etnia FOREIGN KEY (etnia_enum)
+        REFERENCES recadastra.recad_etnia (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_habilitacaocateg FOREIGN KEY (habilitacao_categ_enum)
+        REFERENCES recadastra.recad_cnhcategoria (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_instrucao FOREIGN KEY (cod_instrucao)
+        REFERENCES recadastra.recad_instrucao (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_municipio FOREIGN KEY (municipio_id)
+        REFERENCES recadastra.recad_cidade (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_nacionalidade FOREIGN KEY (nacionalidade_enum)
+        REFERENCES recadastra.recad_nacionalidade (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_naturalidade FOREIGN KEY (naturalidade_id)
+        REFERENCES recadastra.recad_cidade (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_ordememissora FOREIGN KEY (ordem_fkorgao)
+        REFERENCES recadastra.recad_orgaoemissor (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_rgemissor FOREIGN KEY (rg_cod_emissor)
+        REFERENCES recadastra.recad_orgaoemissor (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_sexo FOREIGN KEY (sexo_enum)
+        REFERENCES recadastra.recad_sexo (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_tipologradouro FOREIGN KEY (tipo_logradouro)
+        REFERENCES recadastra.recad_tipologradouro (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_tiposang FOREIGN KEY (tiposang_enum)
+        REFERENCES recadastra.recad_tiposang (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION,
+    CONSTRAINT recad_persona_fk_titulofkcidade FOREIGN KEY (titulo_fkcidade)
+        REFERENCES recadastra.recad_cidade (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_persona
+    OWNER to postgres;
+
+-- Trigger: recad_persona_tr_criaranexos
+
+-- DROP TRIGGER IF EXISTS recad_persona_tr_criaranexos ON recadastra.recad_persona;
+
+CREATE TRIGGER recad_persona_tr_criaranexos
+    BEFORE INSERT
+    ON recadastra.recad_persona
+    FOR EACH ROW
+    EXECUTE FUNCTION public.fntg_criar_anexos();
+
+-- Trigger: recad_persona_tr_uniquecpf
+
+-- DROP TRIGGER IF EXISTS recad_persona_tr_uniquecpf ON recadastra.recad_persona;
+
+CREATE TRIGGER recad_persona_tr_uniquecpf
+    BEFORE INSERT OR UPDATE OF cpf
+    ON recadastra.recad_persona
+    FOR EACH ROW
+    EXECUTE FUNCTION public.fntg_recad_persona_tr_uniquecpf();
+
+
+
+-- public.fntg_criar_anexos
+
+BEGIN
+  insert into recadastra.recad_anexo(fkpersona,fkanexotipo,obrigatorio,emissao_data,validade_data,cadastro_fkusuario,cadastro_data,url,arquivo,observacao)
+  select 
+        ps.id fkpersona,
+        at.id fkanexotipo,
+        at.obrigatorio obrigatorio,
+        null emissao_data,
+        null validade_data,
+        null cadastro_fkusuario,
+        null cadastro_data,
+        null url,
+        null arquivo,
+        null observacao
+    from recadastra.recad_persona ps
+    join recadastra.recad_anexotipo at on true
+   where not exists (select 1 from recadastra.recad_anexo ax where ax.fkpersona = ps.id and ax.fkanexotipo = at.id) 
+     and at.obrigatorio = 1;
+   return new;
+END;
+
+
+-- public.fntg_recad_persona_tr_uniquecpf
+
+
+DECLARE
+  rec record;
+BEGIN
+  select into rec
+         id, cpf, nome
+    from recadastra.recad_persona ps
+   where cpf = new.cpf
+     and id <> new.id;
+  
+  if (found) then
+     raise exception 'O CPF % está cadastrado para %', rec.cpf, rec.nome;
+  end if;
+  
+  return new; 
+END;
+
+
+
+-- Table: recadastra.recad_sexo
+
+-- DROP TABLE IF EXISTS recadastra.recad_sexo;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_sexo
+(
+    id smallint NOT NULL,
+    nome character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    sigla character(1) COLLATE pg_catalog."default",
+    CONSTRAINT recad_sexo_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_sexo_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_sexo
+    OWNER to postgres;
+
+
+---
+
+-- Table: recadastra.recad_etnia
+
+-- DROP TABLE IF EXISTS recadastra.recad_etnia;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_etnia
+(
+    id smallint NOT NULL,
+    nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_etnia_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_etnia_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_etnia
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_cnhcategoria
+
+-- DROP TABLE IF EXISTS recadastra.recad_cnhcategoria;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_cnhcategoria
+(
+    id smallint NOT NULL,
+    nome character varying(15) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_cnhcategoria_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_cnhcategoria_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_cnhcategoria
+    OWNER to postgres;
+
+
+
+---
+
+
+-- Table: recadastra.recad_instrucao
+
+-- DROP TABLE IF EXISTS recadastra.recad_instrucao;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_instrucao
+(
+    id smallint NOT NULL,
+    nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_instrucao_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_instrucao_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_instrucao
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_estadocivil
+
+-- DROP TABLE IF EXISTS recadastra.recad_estadocivil;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_estadocivil
+(
+    id smallint NOT NULL,
+    nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_estadocivil_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_estadocivil_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_estadocivil
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_tiposang
+
+-- DROP TABLE IF EXISTS recadastra.recad_tiposang;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_tiposang
+(
+    id smallint NOT NULL,
+    nome character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_tiposang_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_tiposang_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_tiposang
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_nacionalidade
+
+-- DROP TABLE IF EXISTS recadastra.recad_nacionalidade;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_nacionalidade
+(
+    id smallint NOT NULL,
+    nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    sigla character varying(5) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_nacionalidade_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_nacionalidade_nome_key UNIQUE (nome),
+    CONSTRAINT recad_nacionalidade_sigla_key UNIQUE (sigla)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_nacionalidade
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_tipologradouro
+
+-- DROP TABLE IF EXISTS recadastra.recad_tipologradouro;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_tipologradouro
+(
+    id smallint NOT NULL,
+    nome character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    sigla character varying(10) COLLATE pg_catalog."default",
+    CONSTRAINT recad_tipologradouro_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_tipologradouro_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_tipologradouro
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_banco
+
+-- DROP TABLE IF EXISTS recadastra.recad_banco;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_banco
+(
+    id character(3) COLLATE pg_catalog."default" NOT NULL,
+    nome character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    sigla character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_banco_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_banco_nome_key UNIQUE (nome),
+    CONSTRAINT recad_banco_sigla_key UNIQUE (sigla)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_banco
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_contatipo
+
+-- DROP TABLE IF EXISTS recadastra.recad_contatipo;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_contatipo
+(
+    id smallint NOT NULL,
+    nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_contatipo_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_contatipo_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_contatipo
+    OWNER to postgres;
+
+
+---
+
+
+-- Table: recadastra.recad_orgaoemissor
+
+-- DROP TABLE IF EXISTS recadastra.recad_orgaoemissor;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_orgaoemissor
+(
+    id smallint NOT NULL,
+    nome character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_orgaoemissor_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_orgaoemissor_nome_key UNIQUE (nome)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_orgaoemissor
+    OWNER to postgres;
+
+
+---
+
+-- Table: recadastra.recad_cidade
+
+-- DROP TABLE IF EXISTS recadastra.recad_cidade;
+
+CREATE TABLE IF NOT EXISTS recadastra.recad_cidade
+(
+    id integer NOT NULL,
+    nome character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    uf character(2) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT recad_cidade_pkey PRIMARY KEY (id),
+    CONSTRAINT recad_cidade_fk_uf FOREIGN KEY (uf)
+        REFERENCES recadastra.recad_uf (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS recadastra.recad_cidade
+    OWNER to postgres;
+
+---
+
