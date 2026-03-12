@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RecadastramentoApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2c6b2b3ee85de53fb6e4404a2af28e6e9deabe0a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31b176969ce803d54a8d8c640af6632267642c1e")]
 [assembly: System.Reflection.AssemblyProductAttribute("RecadastramentoApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RecadastramentoApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

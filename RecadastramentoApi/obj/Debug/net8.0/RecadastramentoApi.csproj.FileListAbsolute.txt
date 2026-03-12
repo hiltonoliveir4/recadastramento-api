@@ -42,3 +42,5 @@
 /home/hilton/Documentos/power/recadastramentoAPI/RecadastramentoApi/obj/Debug/net8.0/RecadastramentoApi.pdb
 /home/hilton/Documentos/power/recadastramentoAPI/RecadastramentoApi/obj/Debug/net8.0/RecadastramentoApi.genruntimeconfig.cache
 /home/hilton/Documentos/power/recadastramentoAPI/RecadastramentoApi/obj/Debug/net8.0/ref/RecadastramentoApi.dll
+/home/hilton/Documentos/power/recadastramentoAPI/RecadastramentoApi/obj/Debug/net8.0/RecadastramentoApi.sourcelink.json
+/home/hilton/Documentos/power/recadastramentoAPI/RecadastramentoApi/bin/Debug/net8.0/postman/RecadastramentoApi.postman_collection.json

@@ -16,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 DefaultTypeMap.MatchNamesWithUnderscores = true;
 SqlMapper.AddTypeHandler(new JsonDictionaryTypeHandler());
+SqlMapper.AddTypeHandler(new DateTimeTypeHandler());
+SqlMapper.AddTypeHandler(new NullableDateTimeTypeHandler());
 
 builder.Services.Configure<DatabaseOptions>(builder.Configuration.GetSection(DatabaseOptions.SectionName));
 builder.Services.Configure<ApiSecurityOptions>(builder.Configuration.GetSection(ApiSecurityOptions.SectionName));
