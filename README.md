@@ -101,14 +101,22 @@ Use os valores gerados no `appsettings.json`.
 - `GET /{cidade}/personas?cpf=...&nome=...&municipio_id=...&uf=...&fkrecadastramento=...&recad_status=...`
 - `GET /{cidade}/personas/export?format=json|csv|xlsx`
 
+Nos GETs de persona (`/{cpf}` e listagem), a resposta retorna a persona com os blocos relacionados:
+- `manutencoes`
+- `anexos`
+- `dependentes`
+- `conjuges`
+
 ## POST com dependentes e conjuges
 
 No mesmo `POST /{cidade}/personas`, voce pode enviar:
+- `manutencoes`: grava em `recadastra.recad_manutencao` (funcional da persona)
 - `anexos`: grava em `recadastra.recad_anexo`
 - `dependentes`: grava em `recadastra.recad_dependente`
 - `conjuges`: grava em `recadastra.recad_conjuge`
 
 Regra de upsert dos vinculos:
+- Manutencao: se encontrar o mesmo registro para a persona (por `id` ou chave natural), faz `UPDATE`, senao `INSERT`.
 - Anexo: se existir o par `(fkpersona, fkanexotipo)` faz `UPDATE`, senao `INSERT`.
 - Dependente: se existir o par `(fkresponsavel, fkdependente)` faz `UPDATE`, senao `INSERT`.
 - Conjuge: se existir o par `(fkpersona, fkconjuge)` faz `UPDATE`, senao `INSERT`.

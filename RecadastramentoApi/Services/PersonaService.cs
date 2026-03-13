@@ -61,6 +61,11 @@ public sealed class PersonaService(IPersonaRepository personaRepository, IPerson
                     await personaRepository.UpsertDependentesAsync(personaId.Value, item.Dto.Dependentes, cancellationToken);
                 }
 
+                if (item.Dto.Manutencoes.Count > 0)
+                {
+                    await personaRepository.UpsertManutencoesAsync(personaId.Value, item.Dto.Manutencoes, cancellationToken);
+                }
+
                 if (item.Dto.Anexos.Count > 0)
                 {
                     await personaRepository.UpsertAnexosAsync(personaId.Value, item.Dto.Anexos, cancellationToken);
@@ -83,12 +88,51 @@ public sealed class PersonaService(IPersonaRepository personaRepository, IPerson
     public async Task<PersonaResponseDto?> GetByCpfAsync(string cpf, CancellationToken cancellationToken = default)
     {
         var persona = await personaRepository.GetByCpfAsync(cpf.Trim(), cancellationToken);
-        return persona?.ToResponseDto();
+        if (persona is null)
+        {
+            return null;
+        }
+
+        var response = persona.ToResponseDto();
+        await EnrichResponseAsync([response], cancellationToken);
+        return response;
     }
 
     public async Task<IReadOnlyList<PersonaResponseDto>> GetAllAsync(PersonaFilterDto filter, CancellationToken cancellationToken = default)
     {
         var personas = await personaRepository.GetAllAsync(filter, cancellationToken);
-        return personas.Select(persona => persona.ToResponseDto()).ToList();
+        var responses = personas.Select(persona => persona.ToResponseDto()).ToList();
+        await EnrichResponseAsync(responses, cancellationToken);
+        return responses;
+    }
+
+    private async Task EnrichResponseAsync(List<PersonaResponseDto> personas, CancellationToken cancellationToken)
+    {
+        if (personas.Count == 0)
+        {
+            return;
+        }
+
+        var ids = personas.Select(item => item.Id).ToArray();
+
+        var dependentesTask = personaRepository.GetDependentesByResponsavelIdsAsync(ids, cancellationToken);
+        var conjugesTask = personaRepository.GetConjugesByPersonaIdsAsync(ids, cancellationToken);
+        var anexosTask = personaRepository.GetAnexosByPersonaIdsAsync(ids, cancellationToken);
+        var manutencoesTask = personaRepository.GetManutencoesByPersonaIdsAsync(ids, cancellationToken);
+
+        await Task.WhenAll(dependentesTask, conjugesTask, anexosTask, manutencoesTask);
+
+        var dependentesLookup = dependentesTask.Result;
+        var conjugesLookup = conjugesTask.Result;
+        var anexosLookup = anexosTask.Result;
+        var manutencoesLookup = manutencoesTask.Result;
+
+        foreach (var persona in personas)
+        {
+            persona.Dependentes = dependentesLookup.TryGetValue(persona.Id, out var dependentes) ? dependentes : [];
+            persona.Conjuges = conjugesLookup.TryGetValue(persona.Id, out var conjuges) ? conjuges : [];
+            persona.Anexos = anexosLookup.TryGetValue(persona.Id, out var anexos) ? anexos : [];
+            persona.Manutencoes = manutencoesLookup.TryGetValue(persona.Id, out var manutencoes) ? manutencoes : [];
+        }
     }
 }

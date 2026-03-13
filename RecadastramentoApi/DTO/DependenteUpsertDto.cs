@@ -2,6 +2,7 @@ namespace RecadastramentoApi.DTO;
 
 public sealed class DependenteUpsertDto
 {
+    public long? Id { get; set; }
     public long? FkDependente { get; set; }
     public string? CpfDependente { get; set; }
     public int? FkParentesco { get; set; }

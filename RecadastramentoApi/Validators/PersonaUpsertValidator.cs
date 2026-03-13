@@ -77,6 +77,15 @@ public sealed class PersonaUpsertValidator : IPersonaValidator
             }
         }
 
+        for (var index = 0; index < dto.Manutencoes.Count; index++)
+        {
+            var manutencao = dto.Manutencoes[index];
+            if (manutencao.id.HasValue && manutencao.id <= 0)
+            {
+                errors.Add($"manutencoes[{index}]: id must be greater than zero.");
+            }
+        }
+
         for (var index = 0; index < dto.Conjuges.Count; index++)
         {
             var conjuge = dto.Conjuges[index];

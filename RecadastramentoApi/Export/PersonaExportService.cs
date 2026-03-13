@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -85,6 +86,8 @@ public sealed class PersonaExportService : IPersonaExportService
             DateTime dateTime => dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
             DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture),
             Dictionary<string, string> dictionary => JsonSerializer.Serialize(dictionary),
+            byte[] bytes => Convert.ToBase64String(bytes),
+            IEnumerable enumerable when value is not string => JsonSerializer.Serialize(enumerable),
             _ => Convert.ToString(value, CultureInfo.InvariantCulture)
         };
     }

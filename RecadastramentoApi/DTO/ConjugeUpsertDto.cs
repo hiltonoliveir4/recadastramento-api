@@ -2,6 +2,7 @@ namespace RecadastramentoApi.DTO;
 
 public sealed class ConjugeUpsertDto
 {
+    public long? Id { get; set; }
     public long? FkConjuge { get; set; }
     public string? CpfConjuge { get; set; }
     public int? FkRegimeCasamento { get; set; }

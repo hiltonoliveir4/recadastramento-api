@@ -11,4 +11,6 @@ public sealed class PersonaUpsertDto : PersonaFieldValues
     public List<ConjugeUpsertDto> Conjuges { get; set; } = [];
 
     public List<AnexoUpsertDto> Anexos { get; set; } = [];
+
+    public List<ManutencaoUpsertDto> Manutencoes { get; set; } = [];
 }

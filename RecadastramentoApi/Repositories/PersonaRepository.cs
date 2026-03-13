@@ -463,6 +463,73 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
         LIMIT 1;
         """;
 
+    private const string SelectDependentesByResponsavelIdsSql = """
+        SELECT
+            d.fkresponsavel AS fk_responsavel,
+            d.id,
+            d.fkdependente AS fk_dependente,
+            p.cpf AS cpf_dependente,
+            d.fkparentesco AS fk_parentesco,
+            d.fkespecial AS fk_especial,
+            d.considerar_irrf,
+            d.cadastro_fkusuario,
+            d.cadastro_data,
+            d.encerramento_fkusuario,
+            d.encerramento_motivo,
+            d.observacao,
+            d.excluirregistro AS excluir_registro
+        FROM recadastra.recad_dependente d
+        LEFT JOIN recadastra.recad_persona p ON p.id = d.fkdependente
+        WHERE d.fkresponsavel = ANY(@ResponsavelIds)
+        ORDER BY d.id;
+        """;
+
+    private const string SelectConjugesByPersonaIdsSql = """
+        SELECT
+            c.fkpersona AS fk_persona,
+            c.id,
+            c.fkconjuge AS fk_conjuge,
+            p.cpf AS cpf_conjuge,
+            c.fkregimecasamento AS fk_regime_casamento,
+            c.datacasamento AS data_casamento,
+            c.cadastro_fkusuario,
+            c.cadastro_data,
+            c.encerramento_fkusuario,
+            c.encerramento_data,
+            c.encerramento_motivo,
+            c.observacao,
+            c.excluirregistro AS excluir_registro
+        FROM recadastra.recad_conjuge c
+        LEFT JOIN recadastra.recad_persona p ON p.id = c.fkconjuge
+        WHERE c.fkpersona = ANY(@PersonaIds)
+        ORDER BY c.id;
+        """;
+
+    private const string SelectAnexosByPersonaIdsSql = """
+        SELECT
+            a.fkpersona AS fk_persona,
+            a.id,
+            a.fkanexotipo AS fk_anexo_tipo,
+            a.obrigatorio,
+            a.emissao_data,
+            a.validade_data,
+            a.cadastro_fkusuario,
+            a.cadastro_data,
+            a.url,
+            a.arquivo,
+            a.observacao
+        FROM recadastra.recad_anexo a
+        WHERE a.fkpersona = ANY(@PersonaIds)
+        ORDER BY a.id;
+        """;
+
+    private const string SelectManutencoesByPersonaIdsSql = """
+        SELECT *
+        FROM recadastra.recad_manutencao
+        WHERE fkpersona = ANY(@PersonaIds)
+        ORDER BY id;
+        """;
+
     private const string SelectAnexoByLinkSql = """
         SELECT id
         FROM recadastra.recad_anexo
@@ -561,6 +628,101 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
         WHERE id = @Id;
         """;
 
+    private const string SelectManutencaoOwnerByIdSql = """
+        SELECT fkpersona
+        FROM recadastra.recad_manutencao
+        WHERE id = @id
+        LIMIT 1;
+        """;
+
+    private const string SelectManutencaoByNaturalKeySql = """
+        SELECT id
+        FROM recadastra.recad_manutencao
+        WHERE fkpersona = @fkpersona
+          AND COALESCE(fkrecadastramento, -1) = COALESCE(@fkrecadastramento, -1)
+          AND COALESCE(periodo, '') = COALESCE(@periodo, '')
+          AND COALESCE(cod_folha, '') = COALESCE(@cod_folha, '')
+          AND COALESCE(matricula, '') = COALESCE(@matricula, '')
+          AND COALESCE(contrato, -1) = COALESCE(@contrato, -1)
+        ORDER BY id DESC
+        LIMIT 1;
+        """;
+
+    private static readonly string[] ManutencaoColumns =
+    [
+        "fkrecadastramento", "fkmanutencaobase", "fkempregado", "fkempresa_esocial", "periodo", "cod_folha", "matricula", "contrato",
+        "periodoinclusao_id", "formadeadmissao_id", "data_concurso", "cod_admissao", "data_admissao", "tipo_admissao", "data_fimcontrato",
+        "data_demissao", "cod_desligamento", "tipo_desligamento", "regime_juridico", "cod_vinculo", "turno_enum", "prev_privada",
+        "evento_previdencia", "cod_previdencia", "cod_categoria", "cod_ocorrencia", "data_posse", "observacao", "portaria_data",
+        "portaria_posse", "matricula_anterior", "nomeacao_data", "nomeacao_doc", "nomeacao_enum", "desconta_irrf", "indicador_alvara",
+        "indicador_aprendizgravida", "indicador_teletrabalho", "indicador_trabalhointermitente", "indicador_trabalhoparcial",
+        "codigo_examemedico", "data_examemedico", "cnpj_laboratoio", "crm_medico", "crm_medico_uf", "autorizado", "autorizador_id",
+        "autorizado_data", "autorizado_obs", "assesi", "cod_situacao", "gratificacao", "cod_lotacao", "cod_alocacao",
+        "formadeadmissaoexerc_id", "cod_referencia_funcao", "cod_cargo", "salariobase", "cod_cargo_contratual", "salario_contratual",
+        "cod_cargo_area", "cod_funcao", "base_plantao", "fkevento_sindicato", "fkevento_associacao", "fkevento_adictempserv",
+        "auxilio_transporte", "fkevento_gratif", "fkevento_adictemposervico", "fkevento_previdencia", "fkevento_titulacao",
+        "fkevento_planocarreira", "frequencia_bool", "plano_carreira", "pc_titulo", "especialferias_enum", "especiallicenca_enum",
+        "sal13aniversario_enum", "cpf_pararemessa", "contaremessa_id", "fgts", "siope_segmento", "siope_profinfantil",
+        "siope_mestrepedagogo", "siope_tecnicopedagogo", "siope_notoriosaber", "siope_profgraduado", "siope_psicologo",
+        "siope_servsocial", "siope_outros", "quinquenios_qtde", "depend_irrf", "depend_inss", "dias", "faltas", "salario_bruto",
+        "descontos", "salario_liquido", "salario13_fracao", "reserva_13sal", "reserva_ferias", "reserva_ferias1_3",
+        "reserva_fgts40", "reserva_aviso", "base_ferias", "margem_consignavel", "margem_consignavel_liq", "ativo", "status_enum",
+        "controle_usuario_id", "controle_data_migracao", "controle_data_alteracao", "controle_verificador", "controle_cadastrador_id",
+        "controle_data_cadastro", "recad_userid", "recad_data", "recad_versao", "recad_status"
+    ];
+
+    private static readonly string InsertManutencaoSql = BuildInsertManutencaoSql();
+    private static readonly string UpdateManutencaoSql = BuildUpdateManutencaoSql();
+
+    private sealed class DependenteRow
+    {
+        public long FkResponsavel { get; set; }
+        public long? Id { get; set; }
+        public long? FkDependente { get; set; }
+        public string? CpfDependente { get; set; }
+        public int? FkParentesco { get; set; }
+        public int? FkEspecial { get; set; }
+        public short? ConsiderarIrrf { get; set; }
+        public int? CadastroFkusuario { get; set; }
+        public DateTime? CadastroData { get; set; }
+        public int? EncerramentoFkusuario { get; set; }
+        public string? EncerramentoMotivo { get; set; }
+        public string? Observacao { get; set; }
+        public bool? ExcluirRegistro { get; set; }
+    }
+
+    private sealed class ConjugeRow
+    {
+        public long FkPersona { get; set; }
+        public long? Id { get; set; }
+        public long? FkConjuge { get; set; }
+        public string? CpfConjuge { get; set; }
+        public int? FkRegimeCasamento { get; set; }
+        public DateTime? DataCasamento { get; set; }
+        public int? CadastroFkusuario { get; set; }
+        public DateTime? CadastroData { get; set; }
+        public int? EncerramentoFkusuario { get; set; }
+        public DateTime? EncerramentoData { get; set; }
+        public string? EncerramentoMotivo { get; set; }
+        public string? Observacao { get; set; }
+        public bool? ExcluirRegistro { get; set; }
+    }
+
+    private sealed class AnexoRow
+    {
+        public long FkPersona { get; set; }
+        public long? Id { get; set; }
+        public int? FkAnexoTipo { get; set; }
+        public int? Obrigatorio { get; set; }
+        public DateTime? EmissaoData { get; set; }
+        public DateTime? ValidadeData { get; set; }
+        public int? CadastroFkusuario { get; set; }
+        public DateTime? CadastroData { get; set; }
+        public string? Url { get; set; }
+        public byte[]? Arquivo { get; set; }
+        public string? Observacao { get; set; }
+    }
+
     public async Task<Persona?> GetByCpfAsync(string cpf, CancellationToken cancellationToken = default)
     {
         var sql = $"{SelectColumns} WHERE cpf = @Cpf";
@@ -654,6 +816,75 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
         using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
         var command = new CommandDefinition(UpdateByCpfSql, BuildParameters(dto), cancellationToken: cancellationToken);
         await connection.ExecuteAsync(command);
+    }
+
+    public async Task UpsertManutencoesAsync(long fkPersona, IReadOnlyList<ManutencaoUpsertDto> manutencoes, CancellationToken cancellationToken = default)
+    {
+        if (manutencoes.Count == 0)
+        {
+            return;
+        }
+
+        int fkPersonaInt;
+        try
+        {
+            fkPersonaInt = checked((int)fkPersona);
+        }
+        catch (OverflowException)
+        {
+            throw new InvalidOperationException($"fkpersona value {fkPersona} is out of range for recad_manutencao.fkpersona.");
+        }
+
+        using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+
+        foreach (var manutencao in manutencoes)
+        {
+            var parameters = new DynamicParameters(manutencao);
+            parameters.Add("fkpersona", fkPersonaInt, DbType.Int32);
+
+            long? existingId = null;
+
+            if (manutencao.id.HasValue && manutencao.id.Value > 0)
+            {
+                var ownerCommand = new CommandDefinition(
+                    SelectManutencaoOwnerByIdSql,
+                    new { id = manutencao.id.Value },
+                    cancellationToken: cancellationToken);
+
+                var existingOwner = await connection.QuerySingleOrDefaultAsync<int?>(ownerCommand);
+                if (existingOwner.HasValue && existingOwner.Value != fkPersonaInt)
+                {
+                    throw new InvalidOperationException($"Manutencao id {manutencao.id.Value} belongs to another persona.");
+                }
+
+                if (existingOwner.HasValue)
+                {
+                    existingId = manutencao.id.Value;
+                }
+            }
+
+            if (!existingId.HasValue)
+            {
+                var naturalCommand = new CommandDefinition(
+                    SelectManutencaoByNaturalKeySql,
+                    parameters,
+                    cancellationToken: cancellationToken);
+
+                existingId = await connection.QuerySingleOrDefaultAsync<long?>(naturalCommand);
+            }
+
+            if (existingId.HasValue)
+            {
+                parameters.Add("id", existingId.Value, DbType.Int64);
+                var updateCommand = new CommandDefinition(UpdateManutencaoSql, parameters, cancellationToken: cancellationToken);
+                await connection.ExecuteAsync(updateCommand);
+            }
+            else
+            {
+                var insertCommand = new CommandDefinition(InsertManutencaoSql, parameters, cancellationToken: cancellationToken);
+                await connection.ExecuteAsync(insertCommand);
+            }
+        }
     }
 
     public async Task UpsertAnexosAsync(long fkPersona, IReadOnlyList<AnexoUpsertDto> anexos, CancellationToken cancellationToken = default)
@@ -787,6 +1018,151 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
         }
     }
 
+    public async Task<Dictionary<long, List<DependenteUpsertDto>>> GetDependentesByResponsavelIdsAsync(
+        IReadOnlyCollection<long> fkResponsavelIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (fkResponsavelIds.Count == 0)
+        {
+            return [];
+        }
+
+        using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+        var command = new CommandDefinition(
+            SelectDependentesByResponsavelIdsSql,
+            new { ResponsavelIds = fkResponsavelIds.ToArray() },
+            cancellationToken: cancellationToken);
+
+        var rows = await connection.QueryAsync<DependenteRow>(command);
+
+        return rows
+            .GroupBy(row => row.FkResponsavel)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(row => new DependenteUpsertDto
+                {
+                    Id = row.Id,
+                    FkDependente = row.FkDependente,
+                    CpfDependente = row.CpfDependente,
+                    FkParentesco = row.FkParentesco,
+                    FkEspecial = row.FkEspecial,
+                    ConsiderarIrrf = row.ConsiderarIrrf,
+                    CadastroFkusuario = row.CadastroFkusuario,
+                    CadastroData = row.CadastroData,
+                    EncerramentoFkusuario = row.EncerramentoFkusuario,
+                    EncerramentoMotivo = row.EncerramentoMotivo,
+                    Observacao = row.Observacao,
+                    ExcluirRegistro = row.ExcluirRegistro
+                }).ToList());
+    }
+
+    public async Task<Dictionary<long, List<ConjugeUpsertDto>>> GetConjugesByPersonaIdsAsync(
+        IReadOnlyCollection<long> fkPersonaIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (fkPersonaIds.Count == 0)
+        {
+            return [];
+        }
+
+        using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+        var command = new CommandDefinition(
+            SelectConjugesByPersonaIdsSql,
+            new { PersonaIds = fkPersonaIds.ToArray() },
+            cancellationToken: cancellationToken);
+
+        var rows = await connection.QueryAsync<ConjugeRow>(command);
+
+        return rows
+            .GroupBy(row => row.FkPersona)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(row => new ConjugeUpsertDto
+                {
+                    Id = row.Id,
+                    FkConjuge = row.FkConjuge,
+                    CpfConjuge = row.CpfConjuge,
+                    FkRegimeCasamento = row.FkRegimeCasamento,
+                    DataCasamento = row.DataCasamento,
+                    CadastroFkusuario = row.CadastroFkusuario,
+                    CadastroData = row.CadastroData,
+                    EncerramentoFkusuario = row.EncerramentoFkusuario,
+                    EncerramentoData = row.EncerramentoData,
+                    EncerramentoMotivo = row.EncerramentoMotivo,
+                    Observacao = row.Observacao,
+                    ExcluirRegistro = row.ExcluirRegistro
+                }).ToList());
+    }
+
+    public async Task<Dictionary<long, List<AnexoUpsertDto>>> GetAnexosByPersonaIdsAsync(
+        IReadOnlyCollection<long> fkPersonaIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (fkPersonaIds.Count == 0)
+        {
+            return [];
+        }
+
+        using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+        var command = new CommandDefinition(
+            SelectAnexosByPersonaIdsSql,
+            new { PersonaIds = fkPersonaIds.ToArray() },
+            cancellationToken: cancellationToken);
+
+        var rows = await connection.QueryAsync<AnexoRow>(command);
+
+        return rows
+            .GroupBy(row => row.FkPersona)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(row => new AnexoUpsertDto
+                {
+                    Id = row.Id,
+                    FkAnexoTipo = row.FkAnexoTipo,
+                    Obrigatorio = row.Obrigatorio,
+                    EmissaoData = row.EmissaoData,
+                    ValidadeData = row.ValidadeData,
+                    CadastroFkusuario = row.CadastroFkusuario,
+                    CadastroData = row.CadastroData,
+                    Url = row.Url,
+                    Arquivo = row.Arquivo,
+                    Observacao = row.Observacao
+                }).ToList());
+    }
+
+    public async Task<Dictionary<long, List<ManutencaoUpsertDto>>> GetManutencoesByPersonaIdsAsync(
+        IReadOnlyCollection<long> fkPersonaIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (fkPersonaIds.Count == 0)
+        {
+            return [];
+        }
+
+        int[] personaIds;
+        try
+        {
+            personaIds = fkPersonaIds.Select(id => checked((int)id)).ToArray();
+        }
+        catch (OverflowException)
+        {
+            throw new InvalidOperationException("One or more persona ids are out of range for recad_manutencao.fkpersona.");
+        }
+
+        using var connection = await connectionFactory.CreateOpenConnectionAsync(cancellationToken);
+        var command = new CommandDefinition(
+            SelectManutencoesByPersonaIdsSql,
+            new { PersonaIds = personaIds },
+            cancellationToken: cancellationToken);
+
+        var rows = await connection.QueryAsync<ManutencaoUpsertDto>(command);
+
+        return rows
+            .Where(row => row.fkpersona.HasValue)
+            .GroupBy(row => (long)row.fkpersona!.Value)
+            .ToDictionary(group => group.Key, group => group.ToList());
+    }
+
     private static DynamicParameters BuildParameters(PersonaUpsertDto dto)
     {
         var parameters = new DynamicParameters(dto);
@@ -795,6 +1171,62 @@ public sealed class PersonaRepository(IDbConnectionFactory connectionFactory) : 
             dto.DigitalHstore01 is null ? null : JsonSerializer.Serialize(dto.DigitalHstore01),
             DbType.String);
         return parameters;
+    }
+
+    private static string BuildInsertManutencaoSql()
+    {
+        var columns = new List<string> { "id", "fkpersona" };
+        columns.AddRange(ManutencaoColumns);
+
+        var values = new List<string>
+        {
+            "COALESCE(@id, nextval('recadastra.recad_manutencao_id_seq'::regclass))",
+            "@fkpersona"
+        };
+
+        foreach (var column in ManutencaoColumns)
+        {
+            values.Add(column switch
+            {
+                "autorizado" => "COALESCE(@autorizado, 0)",
+                "base_plantao" => "COALESCE(@base_plantao, 0)",
+                "base_ferias" => "COALESCE(@base_ferias, 0)",
+                "ativo" => "COALESCE(@ativo, 1)",
+                _ => $"@{column}"
+            });
+        }
+
+        return $"""
+            INSERT INTO recadastra.recad_manutencao
+            (
+                {string.Join(",\n                ", columns)}
+            )
+            VALUES
+            (
+                {string.Join(",\n                ", values)}
+            );
+            """;
+    }
+
+    private static string BuildUpdateManutencaoSql()
+    {
+        var assignments = new List<string> { "fkpersona = @fkpersona" };
+        assignments.AddRange(ManutencaoColumns.Select(column => column switch
+        {
+            "autorizado" => "autorizado = COALESCE(@autorizado, autorizado)",
+            "base_plantao" => "base_plantao = COALESCE(@base_plantao, base_plantao)",
+            "base_ferias" => "base_ferias = COALESCE(@base_ferias, base_ferias)",
+            "ativo" => "ativo = COALESCE(@ativo, ativo)",
+            _ => $"{column} = @{column}"
+        }));
+
+        return $"""
+            UPDATE recadastra.recad_manutencao
+            SET
+                {string.Join(",\n                ", assignments)}
+            WHERE id = @id
+              AND fkpersona = @fkpersona;
+            """;
     }
 
     private static async Task<long> ResolveLinkedPersonaIdAsync(
