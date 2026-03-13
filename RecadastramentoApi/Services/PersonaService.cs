@@ -132,7 +132,7 @@ public sealed class PersonaService(IPersonaRepository personaRepository, IPerson
             persona.Dependentes = dependentesLookup.TryGetValue(persona.Id, out var dependentes) ? dependentes : [];
             persona.Conjuges = conjugesLookup.TryGetValue(persona.Id, out var conjuges) ? conjuges : [];
             persona.Anexos = anexosLookup.TryGetValue(persona.Id, out var anexos) ? anexos : [];
-            persona.Manutencoes = manutencoesLookup.TryGetValue(persona.Id, out var manutencoes) ? manutencoes : [];
+            persona.Vinculos = manutencoesLookup.TryGetValue(persona.Id, out var manutencoes) ? manutencoes : [];
         }
     }
 }
