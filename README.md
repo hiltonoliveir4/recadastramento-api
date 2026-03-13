@@ -101,6 +101,27 @@ Use os valores gerados no `appsettings.json`.
 - `GET /{cidade}/personas?cpf=...&nome=...&municipio_id=...&uf=...&fkrecadastramento=...&recad_status=...`
 - `GET /{cidade}/personas/export?format=json|csv|xlsx`
 
+## POST com dependentes e conjuges
+
+No mesmo `POST /{cidade}/personas`, voce pode enviar:
+- `anexos`: grava em `recadastra.recad_anexo`
+- `dependentes`: grava em `recadastra.recad_dependente`
+- `conjuges`: grava em `recadastra.recad_conjuge`
+
+Regra de upsert dos vinculos:
+- Anexo: se existir o par `(fkpersona, fkanexotipo)` faz `UPDATE`, senao `INSERT`.
+- Dependente: se existir o par `(fkresponsavel, fkdependente)` faz `UPDATE`, senao `INSERT`.
+- Conjuge: se existir o par `(fkpersona, fkconjuge)` faz `UPDATE`, senao `INSERT`.
+
+Cada item de dependente/conjuge pode referenciar a pessoa vinculada por:
+- `fk_dependente` / `fk_conjuge` (id da persona), ou
+- `cpf_dependente` / `cpf_conjuge` (a API resolve para `id`).
+
+Campos esperados em `anexos`:
+- `fk_anexo_tipo` (obrigatorio)
+- `obrigatorio`, `emissao_data`, `validade_data`, `cadastro_fkusuario`, `cadastro_data`, `url`, `observacao` (opcionais)
+- `arquivo` (opcional, Base64 no JSON; mapeado para `bytea`)
+
 ## Postman
 
 Collection pronta:

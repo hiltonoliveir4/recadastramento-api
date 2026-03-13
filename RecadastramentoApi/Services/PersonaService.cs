@@ -10,6 +10,7 @@ public sealed class PersonaService(IPersonaRepository personaRepository, IPerson
     public async Task<PersonaBatchUpsertResponseDto> UpsertBatchAsync(IReadOnlyList<PersonaUpsertDto> personas, CancellationToken cancellationToken = default)
     {
         var response = new PersonaBatchUpsertResponseDto();
+        var successfulPersonas = new List<(int Index, PersonaUpsertDto Dto)>();
 
         for (var index = 0; index < personas.Count; index++)
         {
@@ -36,10 +37,43 @@ public sealed class PersonaService(IPersonaRepository personaRepository, IPerson
                     await personaRepository.InsertAsync(dto, cancellationToken);
                     response.Inserted++;
                 }
+
+                successfulPersonas.Add((index, dto));
             }
             catch (Exception exception)
             {
                 response.Errors.Add($"index {index} | cpf {dto.Cpf}: {exception.Message}");
+            }
+        }
+
+        foreach (var item in successfulPersonas)
+        {
+            try
+            {
+                var personaId = await personaRepository.GetIdByCpfAsync(item.Dto.Cpf, cancellationToken);
+                if (!personaId.HasValue)
+                {
+                    throw new InvalidOperationException($"Persona id not found for cpf {item.Dto.Cpf}.");
+                }
+
+                if (item.Dto.Dependentes.Count > 0)
+                {
+                    await personaRepository.UpsertDependentesAsync(personaId.Value, item.Dto.Dependentes, cancellationToken);
+                }
+
+                if (item.Dto.Anexos.Count > 0)
+                {
+                    await personaRepository.UpsertAnexosAsync(personaId.Value, item.Dto.Anexos, cancellationToken);
+                }
+
+                if (item.Dto.Conjuges.Count > 0)
+                {
+                    await personaRepository.UpsertConjugesAsync(personaId.Value, item.Dto.Conjuges, cancellationToken);
+                }
+            }
+            catch (Exception exception)
+            {
+                response.Errors.Add($"index {item.Index} | cpf {item.Dto.Cpf} | relacionamentos: {exception.Message}");
             }
         }
 
