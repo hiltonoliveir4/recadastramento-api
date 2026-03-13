@@ -12,5 +12,5 @@ public sealed class PersonaUpsertDto : PersonaFieldValues
 
     public List<AnexoUpsertDto> Anexos { get; set; } = [];
 
-    public List<ManutencaoUpsertDto> Manutencoes { get; set; } = [];
+    public List<ManutencaoUpsertDto> Vinculos { get; set; } = [];
 }

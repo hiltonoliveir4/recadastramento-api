@@ -77,12 +77,12 @@ public sealed class PersonaUpsertValidator : IPersonaValidator
             }
         }
 
-        for (var index = 0; index < dto.Manutencoes.Count; index++)
+        for (var index = 0; index < dto.Vinculos.Count; index++)
         {
-            var manutencao = dto.Manutencoes[index];
+            var manutencao = dto.Vinculos[index];
             if (manutencao.id.HasValue && manutencao.id <= 0)
             {
-                errors.Add($"manutencoes[{index}]: id must be greater than zero.");
+                errors.Add($"vinculos[{index}]: id must be greater than zero.");
             }
         }
 

@@ -102,7 +102,7 @@ Use os valores gerados no `appsettings.json`.
 - `GET /{cidade}/personas/export?format=json|csv|xlsx`
 
 Nos GETs de persona (`/{cpf}` e listagem), a resposta retorna a persona com os blocos relacionados:
-- `manutencoes`
+- `vinculos`
 - `anexos`
 - `dependentes`
 - `conjuges`
@@ -110,7 +110,7 @@ Nos GETs de persona (`/{cpf}` e listagem), a resposta retorna a persona com os b
 ## POST com dependentes e conjuges
 
 No mesmo `POST /{cidade}/personas`, voce pode enviar:
-- `manutencoes`: grava em `recadastra.recad_manutencao` (funcional da persona)
+- `vinculos`: grava em `recadastra.recad_manutencao` (funcional da persona)
 - `anexos`: grava em `recadastra.recad_anexo`
 - `dependentes`: grava em `recadastra.recad_dependente`
 - `conjuges`: grava em `recadastra.recad_conjuge`

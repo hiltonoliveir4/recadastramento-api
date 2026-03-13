@@ -61,9 +61,9 @@ public sealed class PersonaService(IPersonaRepository personaRepository, IPerson
                     await personaRepository.UpsertDependentesAsync(personaId.Value, item.Dto.Dependentes, cancellationToken);
                 }
 
-                if (item.Dto.Manutencoes.Count > 0)
+                if (item.Dto.Vinculos.Count > 0)
                 {
-                    await personaRepository.UpsertManutencoesAsync(personaId.Value, item.Dto.Manutencoes, cancellationToken);
+                    await personaRepository.UpsertManutencoesAsync(personaId.Value, item.Dto.Vinculos, cancellationToken);
                 }
 
                 if (item.Dto.Anexos.Count > 0)
